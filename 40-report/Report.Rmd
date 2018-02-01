@@ -1,0 +1,27 @@
+---
+title: "Analysis"
+output:
+  html_notebook:
+    toc: true
+    toc_float: true
+    code_folding: hide
+  html_document: default
+---
+
+```{r load}
+
+```
+
+# First view of the data
+```{r echo=FALSE}
+startstations <- journey_data %>% distinct(`StartStation Id`) %$% as.vector(`StartStation Id`)
+endstations <- journey_data %>% distinct(`EndStation Id`) %$% as.vector(`EndStation Id`)
+
+```
+
+There are `r journey_data %>% distinct(`Bike Id`) %>% nrow` number of unique bikes, `r unique(c(startstations,endstations)) %>% length` number of unique stations.
+
+```{r}
+journey_data %>% summarise(mean_duration = mean(Duration, na.rm = TRUE))
+```
+

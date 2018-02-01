@@ -1,0 +1,17 @@
+library(readr)
+library(plyr)
+library(dplyr)
+library(magrittr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(knitr)
+options(stringsAsFactors = FALSE)
+
+source('10-functions/11-func.R')
+source('20-preprocess/21-load.R')
+source('20-preprocess/22-clean.R')
+source('20-preprocess/23-transform.R')
+source('20-preprocess/24-enrich.R')
+
+save(journey_data, file = 'journey_data.RData')
