@@ -3,9 +3,8 @@ title: "Boris bikes"
 output: html_notebook
 ---
 
-
-```{r}
-library(plyr)
+```{r setup}
+library(plyr) 
 library(dplyr)
 library(magrittr)
 library(tidyr)
@@ -17,16 +16,18 @@ options(stringsAsFactors = FALSE)
 load('journey_data.RData')
 ```
 
-Create start and end aggregations.
+### Create start and end aggregations
 
 ```{r}
-journeys_start <- journey_data %>% group_by(`StartStation Name`, startstation_long, startstation_lat) %>% 
+journeys_start <- journey_data %>% 
+  group_by(`StartStation Name`, startstation_long, startstation_lat) %>% 
   summarise(avg_duration = mean(Duration, na.rm = TRUE))
-journeys_end <- journey_data %>% group_by(`EndStation Name`, endstation_long, endstation_lat) %>% 
+journeys_end <- journey_data %>% 
+  group_by(`EndStation Name`, endstation_long, endstation_lat) %>% 
   summarise(avg_duration = mean(Duration, na.rm = TRUE))
 ```
 
-Create the interactive maps.
+### Create the interactive maps
 
 ```{r}
 leaflet(journeys_start) %>% addProviderTiles('CartoDB.Positron') %>% 
@@ -50,11 +51,17 @@ leaflet(journeys_end) %>% addProviderTiles('CartoDB.Positron') %>%
                                    avg_duration))
 ```
 
-Combination map
-```{r}
-journeys_total <- left_join(journeys_start %>% rename(start_avg_duration = avg_duration), journeys_end %>% rename(end_avg_duration = avg_duration), by = c('StartStation Name' = 'EndStation Name')) %>% rename(StationName = `StartStation Name`)
+### Combination map
 
-leaflet(journeys_total) %>% addProviderTiles('CartoDB.Positron') %>% 
+```{r}
+journeys_total <- left_join(journeys_start %>% 
+                              rename(start_avg_duration = avg_duration), journeys_end %>%
+                              rename(end_avg_duration = avg_duration), 
+                            by = c('StartStation Name' = 'EndStation Name')) %>%
+  rename(StationName = `StartStation Name`)
+
+leaflet(journeys_total) %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
   addCircleMarkers(lng = ~startstation_long, lat = ~startstation_lat, 
                    radius = ~start_avg_duration/200, 
                    stroke = FALSE, fillColor = 'green',
@@ -69,31 +76,6 @@ leaflet(journeys_total) %>% addProviderTiles('CartoDB.Positron') %>%
                    popup = ~paste0('<strong>',
                                    `StationName`,'</strong><br />',
                                    end_avg_duration)) %>% 
-  addLayersControl(
-    overlayGroups = c("Start Stations", "End Stations"),
-    options = layersControlOptions(collapsed = FALSE)
-  )
-```
-
-Combination map
-```{r}
-leaflet() %>% addProviderTiles('CartoDB.Positron') %>% 
-  addCircles(data = journeys_start,
-                   lng = ~startstation_long, lat = ~startstation_lat, 
-                   radius = ~avg_duration/5, 
-                   stroke = FALSE, fillColor = 'green',
-                   fillOpacity = 0.6, group = 'Start Stations',
-                   popup = ~paste0('<strong>',
-                                   `StartStation Name`,'</strong><br />',
-                                   avg_duration)) %>%
-  addCircles(data = journeys_end,
-                   lng = ~endstation_long, lat = ~endstation_lat, 
-                   radius = ~avg_duration/5, 
-                   stroke = FALSE, fillColor = 'red',
-                   fillOpacity = 0.6, group = 'End Stations',
-                   popup = ~paste0('<strong>',
-                                   `EndStation Name`,'</strong><br />',
-                                   avg_duration)) %>% 
   addLayersControl(
     overlayGroups = c("Start Stations", "End Stations"),
     options = layersControlOptions(collapsed = FALSE)
