@@ -1,25 +1,31 @@
 ---
 title: "Analysis"
 output:
+  html_document: default
   html_notebook:
     toc: true
     toc_float: true
     code_folding: hide
-  html_document: default
 ---
 
 ```{r load}
-
+library(dplyr)
+library(magrittr)
+load('journey_data.RData')
 ```
 
 # First view of the data
 ```{r echo=FALSE}
-startstations <- journey_data %>% distinct(`StartStation Id`) %$% as.vector(`StartStation Id`)
-endstations <- journey_data %>% distinct(`EndStation Id`) %$% as.vector(`EndStation Id`)
+startstations <- journey_data %>% 
+  distinct(`StartStation Id`) %$% as.vector(`StartStation Id`)
+endstations <- journey_data %>% 
+  distinct(`EndStation Id`) %$% as.vector(`EndStation Id`)
 
+n_unique_bikes <- journey_data %>% distinct(`Bike Id`) %>% nrow
+n_unique_stations <- unique(c(startstations,endstations)) %>% length()
 ```
 
-There are `r journey_data %>% distinct(`Bike Id`) %>% nrow` number of unique bikes, `r unique(c(startstations,endstations)) %>% length` number of unique stations.
+There are `r n_unique_bikes` number of unique bikes, `r n_unique_stations` number of unique stations.
 
 ```{r}
 journey_data %>% summarise(mean_duration = mean(Duration, na.rm = TRUE))
